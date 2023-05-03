@@ -11,12 +11,7 @@ app.use(cors())
 app.use(express.json());
 
 
-app.get("/", (req, res) => {
-    res.status(200).send("Home page");
-});
-
-
-app.use("/medicine", medRouter)
+app.use("/", medRouter)
 
 app.listen(process.env.port, async () => {
     try {
