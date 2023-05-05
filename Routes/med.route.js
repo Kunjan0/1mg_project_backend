@@ -13,10 +13,11 @@ medRouter.post("/add", async (req, res) => {
     }
 });
 
+
 medRouter.get("/", async (req, res) => {
     try {
         const medi = await MedModel.find({ authorID: req.body.authorID });
-        res.status(200).send({ medicine: medi });
+        res.status(200).send({ products: medi });
     } catch (err) {
         res.status(400).send({ err: err.message });
     }
