@@ -13,20 +13,19 @@ medRouter.post("/add", async (req, res) => {
     }
 });
 
-// const getSinglePlayer = async (req, res) => {
-//     try {
-//         const { id } = req.params
-//         const single_player = await Players.findById(id)
-//         res.status(200).send({ Player: single_player })
-//     } catch (error) {
-//         res.status(400).send(error.message)
-//     }
-// }
 
-// FootballRouter.get("/:id", getSinglePlayer)
+medRouter.get("/", async (req, res) => {
+    try {
+        const medi = await MedModel.find({ authorID: req.body.authorID });
+        res.status(200).send({ products: medi });
+    } catch (err) {
+        res.status(400).send({ err: err.message });
+    }
+});
 
 
-medRouter.get("/:id", async (req, res) => {
+
+medRouter.get("/data/:id", async (req, res) => {
     try {
         const { id } = req.params
         const medi = await MedModel.findById({ _id: id })
@@ -37,9 +36,38 @@ medRouter.get("/:id", async (req, res) => {
 });
 
 
-medRouter.get("/", async (req, res) => {
+
+medRouter.get("/:category", async (req, res) => {
+    let filters = { category: req.params.category };
+    let value = 0
+    const { sortrange } = req.query
+    console.log(req.query)
+    if (req.query.brandrange) {
+        filters.brand = req.query.brandrange;
+    }
+    if (req.query.subcat2) {
+        filters.subcat2 = req.query.subcat2;
+    }
+    if (req.query.name) {
+        filters.name = { $regex: req.query.name, $options: "i" };
+    }
+    if (req.query.sortrange) {
+        let priceMin = req.query.sortrange == Object ? req.query.sortrange.join("").split("-")[0] : req.query.sortrange.split("-")[0]
+        filters.price = { $gte: parseFloat(priceMin) };
+    }
+    if (req.query.priceMax) {
+        let priceMax = req.query.sortrange == Object ? req.query.sortrange.join("").split("-")[1] : req.query.sortrange.split("-")[1]
+        filters.price = { ...filters.price, $lte: parseFloat(priceMax) };
+    }
+    if (req.query.sortingByPrice === "asc") {
+        value = Number(1)
+    } else if (req.query.sortingByPrice === "desc") {
+        value = Number(-1)
+    } else {
+        value = 0
+    }
     try {
-        const medi = await MedModel.find({ authorID: req.body.authorID });
+        let medi = await MedModel.find(filters).sort({ price: value }).limit(20);
         res.status(200).send({ products: medi });
     } catch (err) {
         res.status(400).send({ err: err.message });
