@@ -2,7 +2,6 @@ const express = require("express");
 const medRouter = express.Router();
 const MedModel = require("../Model/medicine.model");
 
-
 medRouter.post("/add", async (req, res) => {
     try {
         const medi = MedModel(req.body);
@@ -15,27 +14,13 @@ medRouter.post("/add", async (req, res) => {
 
 medRouter.get("/", async (req, res) => {
     try {
-        const payload = req.body
+        payload = req.body;
         const medi = await MedModel.find(payload);
         res.status(200).send({ products: medi });
     } catch (err) {
         res.status(400).send({ err: err.message });
     }
 });
-
-
-
-medRouter.get("/data/:id", async (req, res) => {
-    try {
-        const { id } = req.params
-        const medi = await MedModel.findById({ _id: id })
-        res.status(200).send({ products: medi });
-    } catch (err) {
-        res.status(400).send({ err: err.message });
-    }
-});
-
-
 
 medRouter.get("/:category", async (req, res) => {
     let filters = { category: req.params.category };
@@ -69,8 +54,8 @@ medRouter.get("/:category", async (req, res) => {
         filters.price = { ...filters.price, $lte: parseFloat(priceMax) };
     }
 
-    const { page } = req.query;
-    let total = await FootballModel.find().count();
+    let { page } = req.query;
+    let total = 400;
     let maxPage = total / 3;
     page = page > maxPage ? maxPage : page;
     if (page == 0 || page == undefined) page = 1;
@@ -96,8 +81,6 @@ medRouter.get("/:category", async (req, res) => {
 });
 
 
-
-
 medRouter.patch("/update/:id", async (req, res) => {
     const { id } = req.params;
     const medi = await MedModel.find({ _id: id });
@@ -118,6 +101,17 @@ medRouter.delete("/delete/:id", async (req, res) => {
     try {
         const data = await MedModel.findByIdAndDelete({ _id: id });
         res.send("data has been Deleted");
+    } catch (err) {
+        res.status(400).send({ err: err.message });
+    }
+});
+
+medRouter.get("/data/:id", async (req, res) => {
+    const { id } = req.params;
+    console.log(id);
+    try {
+        const medi = await MedModel.findById({ _id: id });
+        res.status(200).send({ products: medi });
     } catch (err) {
         res.status(400).send({ err: err.message });
     }
